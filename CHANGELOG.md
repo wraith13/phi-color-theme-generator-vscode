@@ -4,4 +4,9 @@ All notable changes to the "phi-color-theme-generator" extension will be documen
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
 ## [Unreleased]
-- Initial release
+
+## 0.0.0 - 2018-11-13
+
+### Added
+
+- Start this project.

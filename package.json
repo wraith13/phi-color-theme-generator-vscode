@@ -11,14 +11,15 @@
         "Other"
     ],
     "activationEvents": [
-        "onCommand:extension.sayHello"
+        "onCommand:phi-color-theme-generator.generate"
     ],
     "main": "./out/extension",
     "contributes": {
         "commands": [
             {
-                "command": "extension.sayHello",
-                "title": "Hello World"
+                "command": "phi-color-theme-generator.generate",
+                "title": "Generate",
+                "category": "Phi Color Theme"
             }
         ]
     },
