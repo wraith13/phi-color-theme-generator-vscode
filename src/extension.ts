@@ -5,14 +5,13 @@ export module PhiColorTheme
 {
     //let pass_through;
 
-    //const applicationKey = "phi-color-theme-generator";
+    const applicationKey = "phi-color-theme-generator";
 
     export function initialize(context : vscode.ExtensionContext): void
     {
         context.subscriptions.push
         (
-            //vscode.commands.registerCommand(`${applicationKey}.generate`, generate)
-            vscode.commands.registerCommand(`phi-color-theme-generator.generate`, generate)
+            vscode.commands.registerCommand(`${applicationKey}.generate`, generate)
         );
     }
 
