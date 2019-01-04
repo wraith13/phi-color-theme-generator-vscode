@@ -29,6 +29,45 @@ export module PhiColorTheme
     {
         await vscode.window.showInformationMessage('Hello Phi Color Theme!');
     }
+    
+    function generateColor(baseColor : string, h : number, s : number, l :number, isAlignLuma : boolean = true) : string
+    {
+        const rgb = rgbFromStyle(baseColor);
+        var hsl = rgbToHsl(rgb);
+		if (undefined !== h)
+		{
+            hsl.h += Math.PI *2 / phi *h;
+		}
+		if (undefined !== s)
+		{
+            hsl.s = s < 0.0 ?
+                hsl.s / Math.pow(phi, -s):
+                colorHslSMAx -((colorHslSMAx - hsl.s) / Math.pow(phi, s));
+		}
+		if (undefined !== l)
+		{
+            hsl.l = l < 0.0 ?
+                hsl.l / Math.pow(phi, -l):
+                1.0 -((1.0 - hsl.l) / Math.pow(phi, l));
+		}
+		if (isAlignLuma)
+		{
+            const baseLuuma = rgbToLuma(rgb);
+			const luuma = rgbToLuma(hslToRgb(hsl));
+			hsl.l += baseLuuma -luuma;
+		}
+        return rgbForStyle
+        (
+            hslToRgb
+            (
+                {
+                    "h": hsl.h,
+                    "s": hsl.s,
+                    "l": hsl.l,
+                }
+            )
+        );
+    }
 }
 
 export function activate(context: vscode.ExtensionContext) : void
