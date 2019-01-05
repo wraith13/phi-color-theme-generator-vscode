@@ -1,0 +1,28 @@
+{
+    "name": "color-theme-prototype",
+    "displayName": "color theme prototype",
+    "description": "color theme prototype",
+    "version": "0.0.1",
+    "publisher": "wraith13",
+    "license": "SEE LICENSE IN LICENSE_1_0.txt",
+    "engines": {
+        "vscode": "^1.28.0"
+    },
+    "categories": [
+        "Themes"
+    ],
+    "contributes": {
+        "themes": [
+            {
+                "label": "prototype dark",
+                "uiTheme": "vs-dark",
+                "path": "./themes/prototype-dark.json"
+            },
+            {
+                "label": "prototype light",
+                "uiTheme": "vs",
+                "path": "./themes/prototype-light.json"
+            }
+        ]
+    }
+}
