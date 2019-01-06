@@ -30,6 +30,23 @@ export module PhiColorTheme
         await vscode.window.showInformationMessage('Hello Phi Color Theme!');
     }
     
+    function generateTheme(templete : string, name : string, baseColor : string) : string
+    {
+        return templete
+            .replace(/getThemeName\(\)/, name)
+            .replace
+            (
+                /generateColor\(([+-]?\d)\,([+-]?\d)\,([+-]?\d)\)/g,
+                (_match, h, s, l, _offset, _text) => generateColor
+                (
+                    baseColor,
+                    parseInt(h),
+                    parseInt(s),
+                    parseInt(l)
+                )
+            );
+    }
+
     function generateColor(baseColor : string, h : number, s : number, l :number, isAlignLuma : boolean = true) : string
     {
         const rgb = rgbFromStyle(baseColor);
