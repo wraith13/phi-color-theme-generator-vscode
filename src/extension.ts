@@ -85,6 +85,26 @@ export module PhiColorTheme
             )
         );
     }
+
+    export async function applyThemeAsConfiguration(theme : { colors : any, tokenColors : any, }) : Promise<void>
+    {
+        //  "colors"
+        await getConfiguration(undefined, "workbench").update
+        (
+            "colorCustomizations",
+            theme.colors,
+            true
+        );
+        //  "tokenColors"
+        await getConfiguration(undefined, "editor").update
+        (
+            "tokenColorCustomizations",
+            {
+                "textMateRules": theme.tokenColors
+            },
+            true
+        );
+    }
 }
 
 export function activate(context: vscode.ExtensionContext) : void
