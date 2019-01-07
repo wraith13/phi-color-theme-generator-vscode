@@ -86,14 +86,18 @@ export module PhiColorTheme
         );
     }
 
-    export async function applyThemeAsConfiguration(theme : { colors : any, tokenColors : any, }) : Promise<void>
+    export async function applyThemeAsConfiguration
+    (
+        theme : { colors : any, tokenColors : any, },
+        configurationTarget : boolean | vscode.ConfigurationTarget = true
+    ) : Promise<void>
     {
         //  "colors"
         await getConfiguration(undefined, "workbench").update
         (
             "colorCustomizations",
             theme.colors,
-            true
+            configurationTarget
         );
         //  "tokenColors"
         await getConfiguration(undefined, "editor").update
@@ -102,7 +106,7 @@ export module PhiColorTheme
             {
                 "textMateRules": theme.tokenColors
             },
-            true
+            configurationTarget
         );
     }
 }
