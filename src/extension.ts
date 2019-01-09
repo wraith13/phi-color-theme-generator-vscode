@@ -1,5 +1,53 @@
 'use strict';
 import * as vscode from 'vscode';
+import * as fs from 'fs';
+
+module fx
+{
+    export function readdir(path : string)
+        : Thenable<{ error : NodeJS.ErrnoException, files : string[] }>
+    {
+        return new Promise
+        (
+            resolve => fs.readdir
+            (
+                path,
+                (error : NodeJS.ErrnoException, files : string[]) => resolve
+                (
+                    {
+                        error,
+                        files
+                    }
+                )
+            )
+        );
+    }
+
+    export function exists(path : string) : Thenable<boolean>
+    {
+        return new Promise
+        (
+            resolve => fs.exists
+            (
+                path,
+                exists => resolve(exists)
+            )
+        );
+    }
+
+    export function readFile(path : string)
+        : Thenable<{ err : NodeJS.ErrnoException, data : Buffer }>
+    {
+        return new Promise
+        (
+            resolve => fs.readFile
+            (
+                path,
+                (err : NodeJS.ErrnoException, data : Buffer) => resolve({ err, data })
+            )
+        );
+    }
+}
 
 export module PhiColorTheme
 {
