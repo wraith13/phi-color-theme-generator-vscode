@@ -49,6 +49,12 @@ module fx
     }
 }
 
+const themeTempletes =
+{
+    "light": "/templete/themes/prototype-light.json",
+    "dark": "/templete/themes/prototype-dark.json",
+};
+
 export module PhiColorTheme
 {
     //let pass_through;
@@ -75,6 +81,25 @@ export module PhiColorTheme
 
     export async function generate() : Promise<void>
     {
+        const thisExension = vscode.extensions.getExtension(`wraith13.${applicationKey}`);
+        if (thisExension)
+        {
+            const { err, data } = await fx.readFile(`${thisExension.extensionPath}${themeTempletes.dark}`);
+            {
+                if (err)
+                {
+                    await vscode.window.showErrorMessage(err.message);
+                }
+                else
+                {
+                    await applyThemeAsConfiguration(JSON.parse(generateTheme(data.toString(), "phi dark", "#004422")));
+                }
+            }
+        }
+        else
+        {
+            await vscode.window.showErrorMessage("Can not access to this extension's path");
+        }
         await vscode.window.showInformationMessage('Hello Phi Color Theme!');
     }
     
