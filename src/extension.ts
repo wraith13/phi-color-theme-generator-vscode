@@ -36,14 +36,14 @@ module fx
     }
 
     export function readFile(path : string)
-        : Thenable<{ err : NodeJS.ErrnoException, data : Buffer }>
+        : Thenable<{ error : NodeJS.ErrnoException, data : Buffer }>
     {
         return new Promise
         (
             resolve => fs.readFile
             (
                 path,
-                (err : NodeJS.ErrnoException, data : Buffer) => resolve({ err, data })
+                (error : NodeJS.ErrnoException, data : Buffer) => resolve({ error, data })
             )
         );
     }
@@ -84,11 +84,11 @@ export module PhiColorTheme
         const thisExension = vscode.extensions.getExtension(`wraith13.${applicationKey}`);
         if (thisExension)
         {
-            const { err, data } = await fx.readFile(`${thisExension.extensionPath}${themeTempletes.dark}`);
+            const { error, data } = await fx.readFile(`${thisExension.extensionPath}${themeTempletes.dark}`);
             {
-                if (err)
+                if (error)
                 {
-                    await vscode.window.showErrorMessage(err.message);
+                    await vscode.window.showErrorMessage(error.message);
                 }
                 else
                 {
