@@ -79,6 +79,11 @@ export module PhiColorTheme
         );
     }
 
+    const removeCommentFromJson = (json : string) : string => json
+        .replace(/\/\*[\S\s]*?\*\//g, "")
+        .replace(/\/\/.*/g, "");
+        //  とりあえず雑に処理
+
     export async function generate() : Promise<void>
     {
         const thisExension = vscode.extensions.getExtension(`wraith13.${applicationKey}`);
