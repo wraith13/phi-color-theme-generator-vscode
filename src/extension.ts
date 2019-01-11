@@ -49,11 +49,16 @@ module fx
     }
 }
 
-const themeTempletes =
+interface ThemeInterface
 {
-    "light": "/templete/themes/prototype-light.json",
-    "dark": "/templete/themes/prototype-dark.json",
-};
+    $schema : string;
+    name : string;
+    type : string;
+    colors : object;
+    tokenColors : object;
+}
+
+const themeTempletes : {[key:string]:ThemeInterface} ={};
 
 export module PhiColorTheme
 {
