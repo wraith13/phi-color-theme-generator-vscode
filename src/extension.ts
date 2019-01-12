@@ -89,12 +89,12 @@ export module PhiColorTheme
         .replace(/\/\/.*/g, "");
         //  とりあえず雑に処理
 
-    export async function generate() : Promise<void>
+    async function loadTempletes() : Promise<void>
     {
         const thisExension = vscode.extensions.getExtension(`wraith13.${applicationKey}`);
         if (thisExension)
         {
-            const { error, data } = await fx.readFile(`${thisExension.extensionPath}${themeTempletes.dark}`);
+            const { error, files } = await fx.readdir(`${thisExension.extensionPath}/templete/themes`);
             {
                 if (error)
                 {
@@ -102,7 +102,22 @@ export module PhiColorTheme
                 }
                 else
                 {
-                    await applyThemeAsConfiguration(JSON.parse(generateTheme(data.toString(), "phi dark", "#004422")));
+                    files.filter(i => i.endsWith(".json")).forEach
+                    (
+                        async (i) =>
+                        {
+                            const { error, data } = await fx.readFile(`${thisExension.extensionPath}/templete/themes/${i}`);
+                            if (error)
+                            {
+                                await vscode.window.showErrorMessage(error.message);
+                            }
+                            else
+                            {
+                                const theme = <ThemeInterface>JSON.parse(removeCommentFromJson(data.toString()));
+                                themeTempletes[theme.name] = theme;
+                            }
+                        }
+                    );
                 }
             }
         }
@@ -110,6 +125,11 @@ export module PhiColorTheme
         {
             await vscode.window.showErrorMessage("Can not access to this extension's path");
         }
+    }
+    export async function generate() : Promise<void>
+    {
+        await loadTempletes();
+        await applyThemeAsConfiguration(JSON.parse(generateTheme(JSON.stringify(themeTempletes["prototype light"]), "phi dark", "#004422")));
         await vscode.window.showInformationMessage('Hello Phi Color Theme!');
     }
     
