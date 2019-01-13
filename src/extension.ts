@@ -133,7 +133,36 @@ export module PhiColorTheme
     export async function generate() : Promise<void>
     {
         await makeSureLoadTempletes();
-        await applyThemeAsConfiguration(JSON.parse(generateTheme(JSON.stringify(themeTempletes["prototype light"]), "phi dark", "#004422")));
+        const select = await vscode.window.showQuickPick
+        (
+            Object.keys(themeTempletes)
+                .map(i => themeTempletes[i])
+                .map
+                (
+                    i =>
+                    (
+                        {
+                            label: i.name,
+                            description: i.type
+                        }
+                    )
+                )
+        );
+        if (select)
+        {
+            await applyThemeAsConfiguration
+            (
+                JSON.parse
+                (
+                    generateTheme
+                    (
+                        JSON.stringify(themeTempletes[select.label]),
+                        "phi dark",
+                        "#004422"
+                    )
+                )
+            );
+        }
         await vscode.window.showInformationMessage('Hello Phi Color Theme!');
     }
     
@@ -158,28 +187,28 @@ export module PhiColorTheme
     {
         const rgb = rgbFromStyle(baseColor);
         var hsl = rgbToHsl(rgb);
-		if (undefined !== h)
-		{
+        if (undefined !== h)
+        {
             hsl.h += Math.PI *2 / phi *h;
-		}
-		if (undefined !== s)
-		{
+        }
+        if (undefined !== s)
+        {
             hsl.s = s < 0.0 ?
                 hsl.s / Math.pow(phi, -s):
                 colorHslSMAx -((colorHslSMAx - hsl.s) / Math.pow(phi, s));
-		}
-		if (undefined !== l)
-		{
+        }
+        if (undefined !== l)
+        {
             hsl.l = l < 0.0 ?
                 hsl.l / Math.pow(phi, -l):
                 1.0 -((1.0 - hsl.l) / Math.pow(phi, l));
-		}
-		if (isAlignLuma)
-		{
+        }
+        if (isAlignLuma)
+        {
             const baseLuuma = rgbToLuma(rgb);
-			const luuma = rgbToLuma(hslToRgb(hsl));
-			hsl.l += baseLuuma -luuma;
-		}
+            const luuma = rgbToLuma(hslToRgb(hsl));
+            hsl.l += baseLuuma -luuma;
+        }
         return rgbForStyle
         (
             hslToRgb
