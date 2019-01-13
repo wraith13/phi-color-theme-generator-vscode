@@ -89,7 +89,7 @@ export module PhiColorTheme
         .replace(/\/\/.*/g, "");
         //  とりあえず雑に処理
 
-    async function loadTempletes() : Promise<void>
+    async function loadTempletes() : Promise<{[key:string]:ThemeInterface}>
     {
         const thisExension = vscode.extensions.getExtension(`wraith13.${applicationKey}`);
         if (thisExension)
@@ -125,10 +125,14 @@ export module PhiColorTheme
         {
             await vscode.window.showErrorMessage("Can not access to this extension's path");
         }
+        return themeTempletes;
     }
+    async function makeSureLoadTempletes() : Promise<{[key:string]:ThemeInterface}> =>
+        Object.keys(themeTempletes).length ? themeTempletes: await loadTempletes();
+
     export async function generate() : Promise<void>
     {
-        await loadTempletes();
+        await makeSureLoadTempletes();
         await applyThemeAsConfiguration(JSON.parse(generateTheme(JSON.stringify(themeTempletes["prototype light"]), "phi dark", "#004422")));
         await vscode.window.showInformationMessage('Hello Phi Color Theme!');
     }
