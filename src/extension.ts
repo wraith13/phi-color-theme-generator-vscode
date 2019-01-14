@@ -166,6 +166,9 @@ export module PhiColorTheme
         await vscode.window.showInformationMessage('Hello Phi Color Theme!');
     }
     
+    const calcHueIndex = (baseColor : ColorHsl, targetColor : ColorHsl, indexSize : number = 13) : number =>
+        (Math.round((targetColor.h -baseColor.h) * indexSize) +indexSize) % indexSize;
+
     function generateTheme(templete : string, name : string, baseColor : string) : string
     {
         return templete
