@@ -1,28 +1,28 @@
 let pass_through;
-let phi = 1.618033988749895;
+export const phi = 1.618033988749895;
 
-interface ColorRgb
+export interface ColorRgb
 {
     r : number; // min:0.0, max:1.0
     g : number; // min:0.0, max:1.0
     b : number; // min:0.0, max:1.0
 }
 //	※座標空間的に RGB 色空間立方体の座標として捉えるので、本来であれば円筒形あるいは双円錐形の座標となる HLS (および HSV とも)厳密には異なるが、ここでは便宜上 HLS と呼称する。
-interface ColorHsl
+export interface ColorHsl
 {
     h : number; // min:-Math.PI, max:Math.PI
     s : number; // min:0.0, max:Math,Pow(calcSaturation({r:1.0, g:0.0, b:0.0}), 2) === 2.0/3.0
     l : number; // min:0.0, max:1.0
 }
-const colorHslHMin = -Math.PI;
-const colorHslHMAx = Math.PI;
-const colorHslSMin = 0.0;
-const colorHslSMAx = 2.0 / 3.0;
-const colorHslLMin = 0.0;
-const colorHslLMAx = 1.0;
-const rLumaRate = 0.299;
-const gLumaRate = 0.587;
-const bLumaRate = 0.114;
+export const colorHslHMin = -Math.PI;
+export const colorHslHMAx = Math.PI;
+export const colorHslSMin = 0.0;
+export const colorHslSMAx = 2.0 / 3.0;
+export const colorHslLMin = 0.0;
+export const colorHslLMAx = 1.0;
+export const rLumaRate = 0.299;
+export const gLumaRate = 0.587;
+export const bLumaRate = 0.114;
 
 interface Point3d
 {
@@ -30,7 +30,7 @@ interface Point3d
     y : number;
     z : number;
 }
-const rgbForStyle = function(expression: ColorRgb)
+export const rgbForStyle = function(expression: ColorRgb)
 {
     const toHex = (i : number) : string => {
         let result = ((255 *i) ^ 0).toString(16).toUpperCase();
@@ -45,7 +45,7 @@ const rgbForStyle = function(expression: ColorRgb)
             +toHex(expression.b)
     ;
 };
-const rgbFromStyle = function(style : string) : ColorRgb
+export const rgbFromStyle = function(style : string) : ColorRgb
 {
     let r = 0.0;
     let g = 0.0;
@@ -68,9 +68,9 @@ const rgbFromStyle = function(style : string) : ColorRgb
     }
     return {r, g, b};
 };
-const xyzToLength = (xyz : Point3d) : number => Math.sqrt(Math.pow(xyz.x, 2) +Math.pow(xyz.y, 2) +Math.pow(xyz.z, 2));
-const rgbToXyz = (expression : ColorRgb) : Point3d => pass_through = {x:expression.r, y:expression.g, z:expression.b};
-const rgbToHue = (expression : ColorRgb) => {
+export const xyzToLength = (xyz : Point3d) : number => Math.sqrt(Math.pow(xyz.x, 2) +Math.pow(xyz.y, 2) +Math.pow(xyz.z, 2));
+export const rgbToXyz = (expression : ColorRgb) : Point3d => pass_through = {x:expression.r, y:expression.g, z:expression.b};
+export const rgbToHue = (expression : ColorRgb) => {
     const hueXy = {
         x: expression.r -((expression.g /2) +(expression.b /2)),
         y: Math.sqrt(Math.pow(expression.g, 2) -Math.pow(expression.g /2, 2))
@@ -78,27 +78,27 @@ const rgbToHue = (expression : ColorRgb) => {
     };
     return Math.atan2(hueXy.y, hueXy.x);
 };
-const rgbToLuma = (expression : ColorRgb) : number => (expression.r *rLumaRate) +(expression.g *gLumaRate) +(expression.b *bLumaRate);
-const rgbToLightness = (expression : ColorRgb) : number => (expression.r +expression.g +expression.b) /3.0;
-const calcSaturation = (expression : ColorRgb) : number => {
+export const rgbToLuma = (expression : ColorRgb) : number => (expression.r *rLumaRate) +(expression.g *gLumaRate) +(expression.b *bLumaRate);
+export const rgbToLightness = (expression : ColorRgb) : number => (expression.r +expression.g +expression.b) /3.0;
+export const calcSaturation = (expression : ColorRgb) : number => {
     const lightness = rgbToLightness(expression);
     return xyzToLength({x:expression.r -lightness, y:expression.g -lightness, z:expression.b -lightness});
 };
-const rgbToSaturation = (expression : ColorRgb) : number => calcSaturation(expression) *calcSaturation({r:1.0, g:0.0, b:0.0});
-const rgbToHsl = (expression : ColorRgb) : ColorHsl => pass_through =
+export const rgbToSaturation = (expression : ColorRgb) : number => calcSaturation(expression) *calcSaturation({r:1.0, g:0.0, b:0.0});
+export const rgbToHsl = (expression : ColorRgb) : ColorHsl => pass_through =
 {
     h: rgbToHue(expression),
     s: rgbToSaturation(expression),
     l: rgbToLightness(expression)
 };
-const hslToRgbElement = (expression : ColorHsl, colorAngle : number) : number => expression.l +expression.s *Math.cos(expression.h -(Math.PI *2) /3.0 *colorAngle);
-const hslToRgb = (expression : ColorHsl) : ColorRgb => pass_through =
+export const hslToRgbElement = (expression : ColorHsl, colorAngle : number) : number => expression.l +expression.s *Math.cos(expression.h -(Math.PI *2) /3.0 *colorAngle);
+export const hslToRgb = (expression : ColorHsl) : ColorRgb => pass_through =
 {
     r:hslToRgbElement(expression, 0.0),
     g:hslToRgbElement(expression, 1.0),
     b:hslToRgbElement(expression, 2.0)
 };
-const regulateHue = (expression : ColorHsl) : ColorHsl =>
+export const regulateHue = (expression : ColorHsl) : ColorHsl =>
 {
     let h = expression.h;
     while(h < -Math.PI)
@@ -116,13 +116,13 @@ const regulateHue = (expression : ColorHsl) : ColorHsl =>
         l: expression.l,
     };
 };
-const clipLightness = (expression : ColorHsl) : ColorHsl => pass_through =
+export const clipLightness = (expression : ColorHsl) : ColorHsl => pass_through =
 {
     h: expression.h,
     s: expression.s,
     l: Math.max(0.0, Math.min(1.0, expression.l)),
 };
-const clipSaturation = (expression : ColorHsl) : ColorHsl =>
+export const clipSaturation = (expression : ColorHsl) : ColorHsl =>
 {
     const rgb = hslToRgb(expression);
     const overRate = Math.max
@@ -146,8 +146,8 @@ const clipSaturation = (expression : ColorHsl) : ColorHsl =>
         l: expression.l,
     };
 };
-const regulateHsl = (expression : ColorHsl) : ColorHsl => clipSaturation(clipLightness(regulateHue(expression)));
-const clipRgb = (expression : ColorRgb) : ColorRgb => pass_through =
+export const regulateHsl = (expression : ColorHsl) : ColorHsl => clipSaturation(clipLightness(regulateHue(expression)));
+export const clipRgb = (expression : ColorRgb) : ColorRgb => pass_through =
 {
     r: Math.max(0.0, Math.min(1.0, expression.r)),
     g: Math.max(0.0, Math.min(1.0, expression.g)),
@@ -155,7 +155,7 @@ const clipRgb = (expression : ColorRgb) : ColorRgb => pass_through =
 };
 
 /*
-const test = () =>
+export const test = () =>
 {
     console.log("rgbToHsl({r:0.0,g:0.0,b:0.0})", rgbToHsl({r:0.0,g:0.0,b:0.0}));
     console.log("rgbToHsl({r:1.0,g:0.0,b:0.0})", rgbToHsl({r:1.0,g:0.0,b:0.0}));
