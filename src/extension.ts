@@ -168,6 +168,8 @@ export module PhiColorTheme
     
     const calcHueIndex = (baseColor : ColorHsl, targetColor : ColorHsl, indexSize : number = 13) : number =>
         (Math.round((targetColor.h -baseColor.h) * indexSize) +indexSize) % indexSize;
+    const calcSaturationIndex = (baseColor : ColorHsl, targetColor : ColorHsl) : number =>
+        Math.round(Math.log(targetColor.s / baseColor.s) / Math.log(phi));
 
     function generateTheme(templete : string, name : string, baseColor : string) : string
     {
