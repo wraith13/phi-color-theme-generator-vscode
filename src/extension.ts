@@ -58,7 +58,7 @@ interface ThemeInterface
     tokenColors : object;
 }
 
-const themeTempletes : {[key:string]:ThemeInterface} ={};
+const themeTempletes : {[key:string]:string} = { };
 
 export module PhiColorTheme
 {
@@ -89,7 +89,7 @@ export module PhiColorTheme
         .replace(/\/\/.*/g, "");
         //  とりあえず雑に処理
 
-    async function loadTempletes() : Promise<{[key:string]:ThemeInterface}>
+    async function loadTempletes() : Promise<{[key:string]:string}>
     {
         const thisExension = vscode.extensions.getExtension(`wraith13.${applicationKey}`);
         if (thisExension)
@@ -102,21 +102,25 @@ export module PhiColorTheme
                 }
                 else
                 {
-                    files.filter(i => i.endsWith(".json")).forEach
+                    await Promise.all
                     (
-                        async (i) =>
-                        {
-                            const { error, data } = await fx.readFile(`${thisExension.extensionPath}/templete/themes/${i}`);
-                            if (error)
+                        files.filter(i => i.endsWith(".json")).map
+                        (
+                            async (i) =>
                             {
-                                await vscode.window.showErrorMessage(error.message);
+                                const { error, data } = await fx.readFile(`${thisExension.extensionPath}/templete/themes/${i}`);
+                                if (error)
+                                {
+                                    await vscode.window.showErrorMessage(error.message);
+                                }
+                                else
+                                {
+                                    const json = data.toString();
+                                    const theme = <ThemeInterface>JSON.parse(removeCommentFromJson(json));
+                                    themeTempletes[theme.name] = json;
+                                }
                             }
-                            else
-                            {
-                                const theme = <ThemeInterface>JSON.parse(removeCommentFromJson(data.toString()));
-                                themeTempletes[theme.name] = theme;
-                            }
-                        }
+                        )
                     );
                 }
             }
@@ -127,7 +131,7 @@ export module PhiColorTheme
         }
         return themeTempletes;
     }
-    async function makeSureLoadTempletes() : Promise<{[key:string]:ThemeInterface}> =>
+    const makeSureLoadTempletes = async () : Promise<{[key:string]:string}> =>
         Object.keys(themeTempletes).length ? themeTempletes: await loadTempletes();
 
     export async function generate() : Promise<void>
@@ -136,14 +140,13 @@ export module PhiColorTheme
         const select = await vscode.window.showQuickPick
         (
             Object.keys(themeTempletes)
-                .map(i => themeTempletes[i])
                 .map
                 (
                     i =>
                     (
                         {
-                            label: i.name,
-                            description: i.type
+                            label: i,
+                            description: "",
                         }
                     )
                 )
