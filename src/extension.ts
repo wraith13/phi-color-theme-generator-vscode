@@ -1,6 +1,7 @@
 'use strict';
 import * as vscode from 'vscode';
 import * as fs from 'fs';
+import * as color from './color';
 
 module fx
 {
@@ -169,10 +170,10 @@ export module PhiColorTheme
         await vscode.window.showInformationMessage('Hello Phi Color Theme!');
     }
     
-    const calcHueIndex = (baseColor : ColorHsl, targetColor : ColorHsl, indexSize : number = 13) : number =>
-        (Math.round((targetColor.h -baseColor.h) * indexSize) +indexSize) % indexSize;
-    const calcSaturationIndex = (baseColor : ColorHsl, targetColor : ColorHsl) : number =>
-        Math.round(Math.log(targetColor.s / baseColor.s) / Math.log(phi));
+    const calcHueIndex = (baseColor : color.ColorHsl, targetColor : color.ColorHsl, indexSize : number = 13) : number =>
+        (Math.round((targetColor.h -baseColor.h) * indexSize / (Math.PI * 2)) +indexSize) % indexSize;
+    const calcSaturationIndex = (baseColor : color.ColorHsl, targetColor : color.ColorHsl) : number =>
+        Math.round(Math.log(Math.max(targetColor.s, 0.01) / Math.max(baseColor.s, 0.01)) / Math.log(color.phi));
 
     function generateTheme(templete : string, name : string, baseColor : string) : string
     {
@@ -193,33 +194,33 @@ export module PhiColorTheme
 
     function generateColor(baseColor : string, h : number, s : number, l :number, isAlignLuma : boolean = true) : string
     {
-        const rgb = rgbFromStyle(baseColor);
-        var hsl = rgbToHsl(rgb);
+        const rgb = color.rgbFromStyle(baseColor);
+        var hsl = color.rgbToHsl(rgb);
         if (undefined !== h)
         {
-            hsl.h += Math.PI *2 / phi *h;
+            hsl.h += Math.PI *2 / color.phi *h;
         }
         if (undefined !== s)
         {
             hsl.s = s < 0.0 ?
-                hsl.s / Math.pow(phi, -s):
-                colorHslSMAx -((colorHslSMAx - hsl.s) / Math.pow(phi, s));
+                hsl.s / Math.pow(color.phi, -s):
+                color.colorHslSMAx -((color.colorHslSMAx - hsl.s) / Math.pow(color.phi, s));
         }
         if (undefined !== l)
         {
             hsl.l = l < 0.0 ?
-                hsl.l / Math.pow(phi, -l):
-                1.0 -((1.0 - hsl.l) / Math.pow(phi, l));
+                hsl.l / Math.pow(color.phi, -l):
+                1.0 -((1.0 - hsl.l) / Math.pow(color.phi, l));
         }
         if (isAlignLuma)
         {
-            const baseLuuma = rgbToLuma(rgb);
-            const luuma = rgbToLuma(hslToRgb(hsl));
+            const baseLuuma = color.rgbToLuma(rgb);
+            const luuma = color.rgbToLuma(color.hslToRgb(hsl));
             hsl.l += baseLuuma -luuma;
         }
-        return rgbForStyle
+        return color.rgbForStyle
         (
-            hslToRgb
+            color.hslToRgb
             (
                 {
                     "h": hsl.h,
