@@ -1,7 +1,7 @@
 'use strict';
 import * as vscode from 'vscode';
 import * as fs from 'fs';
-import * as color from './color';
+import { color } from './color';
 
 module fx
 {
