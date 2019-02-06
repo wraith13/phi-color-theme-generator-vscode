@@ -137,43 +137,114 @@ export module PhiColorTheme
 
     export async function generate() : Promise<void>
     {
-        await makeSureLoadTempletes();
-        const select = await vscode.window.showQuickPick
-        (
-            Object.keys(themeTempletes)
-                .map
-                (
-                    i =>
-                    (
-                        {
-                            label: i,
-                            description: "",
-                        }
-                    )
-                )
-        );
-        if (select)
+        try
         {
-            await applyThemeAsConfiguration
+            await makeSureLoadTempletes();
+            const select = await vscode.window.showQuickPick
             (
-                JSON.parse
-                (
-                    generateTheme
+                Object.keys(themeTempletes)
+                    .map
                     (
-                        JSON.stringify(themeTempletes[select.label]),
-                        "phi dark",
-                        "#004422"
+                        i =>
+                        (
+                            {
+                                label: i,
+                                description: "",
+                            }
+                        )
                     )
-                )
             );
+            if (select)
+            {
+                await applyThemeAsConfiguration
+                (
+                    JSON.parse
+                    (
+                        generateTheme
+                        (
+                            JSON.stringify(generateTemplete(themeTempletes[select.label])),
+                            "phi dark",
+                            "#004422"
+                        )
+                    )
+                );
+            }
+            await vscode.window.showInformationMessage('Hello Phi Color Theme!');
         }
-        await vscode.window.showInformationMessage('Hello Phi Color Theme!');
+        catch(error)
+        {
+            console.error(error);
+        }
     }
     
-    const calcHueIndex = (baseColor : color.ColorHsl, targetColor : color.ColorHsl, indexSize : number = 13) : number =>
+    const calcHueIndex = (baseColor : color.Hsl, targetColor : color.Hsl, indexSize : number = 13) : number =>
         (Math.round((targetColor.h -baseColor.h) * indexSize / (Math.PI * 2)) +indexSize) % indexSize;
-    const calcSaturationIndex = (baseColor : color.ColorHsl, targetColor : color.ColorHsl) : number =>
+    const calcSaturationIndex = (baseColor : color.Hsl, targetColor : color.Hsl) : number =>
         Math.round(Math.log(Math.max(targetColor.s, 0.01) / Math.max(baseColor.s, 0.01)) / Math.log(color.phi));
+    const calcLightnessIndex = (baseColor : color.Hsl, targetColor : color.Hsl) : number =>
+        Math.round(Math.log(Math.max(color.rgbToLuma(color.hslToRgb(targetColor)), 0.01) / Math.max(color.rgbToLuma(color.hslToRgb(baseColor)),0.01)) / Math.log(color.phi));
+
+    function generateTemplete(themeJson : string) : string
+    {
+        const theme = JSON.parse(removeCommentFromJson(themeJson));
+        const baseColor = color.rgbToHsl(color.rgbFromStyle(theme["colors"]["editor.background"]));
+
+        const hueCounts : {index: number, count:number, indexOffset:number}[] = [];
+        themeJson
+            .replace
+            (
+                /\"(#[0-9A-Fa-f]{6})([0-9A-Fa-f]{0,2})\"/g,
+                (match, rgb, _a, _offset, _text) =>
+                {
+                    const hsl = color.rgbToHsl(color.rgbFromStyle(rgb));
+                    const index = calcHueIndex(baseColor, hsl);
+                    //console.log(`${JSON.stringify({rgb, baseColor, hsl, index})}`);
+                    let data = hueCounts.filter(i => i.index === index)[0];
+                    if (!data)
+                    {
+                        data =
+                        {
+                            index,
+                            count: 0,
+                            indexOffset: 0,
+                        };
+                        hueCounts.push(data);
+                    }
+                    ++data.count;
+                    return match;
+                }
+            );
+        
+
+        hueCounts.filter(i => i.index === 0)[0].count = hueCounts.map(i => i.count).reduce((p, x) => p +x, 0);
+        hueCounts.forEach
+        (
+            (i, iIndex) =>
+                i.indexOffset = hueCounts
+                    .filter((j, jIndex) => i.count < j.count || (i.count === j.count && iIndex < jIndex))
+                    .length
+        );
+
+        console.log(`hueCounts:${JSON.stringify(hueCounts,null,4)}`);
+
+        const templeteJson =
+            themeJson
+            .replace
+            (
+                /\"(#[0-9A-Fa-f]{6})([0-9A-Fa-f]{0,2})\"/g,
+                (_match, rgb, a, _offset, _text) =>
+                {
+                    const hsl = color.rgbToHsl(color.rgbFromStyle(rgb));
+                    const index = calcHueIndex(baseColor, hsl);
+                    let data = hueCounts.filter(i => i.index === index)[0];
+                    return `"generateColor(${data.indexOffset},${calcSaturationIndex(baseColor, hsl)},${calcLightnessIndex(baseColor, hsl)})${a}"`;
+                }
+            );
+        const templeteTheme = JSON.parse(removeCommentFromJson(templeteJson));
+        templeteTheme.name = "getThemeName()";
+        console.error(JSON.stringify(templeteTheme, null, 4));
+        return JSON.stringify(templeteTheme, null, 4);
+    }
 
     function generateTheme(templete : string, name : string, baseColor : string) : string
     {
@@ -204,7 +275,7 @@ export module PhiColorTheme
         {
             hsl.s = s < 0.0 ?
                 hsl.s / Math.pow(color.phi, -s):
-                color.colorHslSMAx -((color.colorHslSMAx - hsl.s) / Math.pow(color.phi, s));
+                color.HslSMax -((color.HslSMax - hsl.s) / Math.pow(color.phi, s));
         }
         if (undefined !== l)
         {
